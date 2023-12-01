@@ -3,6 +3,7 @@ import './App.css'
 import ReactDomServer from 'react-dom/server'
 import Markdown from 'react-markdown'
 import rehypeRaw from "rehype-raw";
+// @ts-ignore
 import { deserialize } from 'react-serialize'
 import xmlFormat from 'xml-formatter'
 
