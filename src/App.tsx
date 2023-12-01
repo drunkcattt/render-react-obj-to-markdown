@@ -1,13 +1,33 @@
-import React from 'react'
+// @ts-nocheck
+import React, { FC, ReactComponentElement, ReactNode } from 'react'
 import './App.css'
 import ReactDomServer from 'react-dom/server'
 import Markdown from 'react-markdown'
 import rehypeRaw from "rehype-raw";
-// @ts-ignore
 import { deserialize } from 'react-serialize'
 import xmlFormat from 'xml-formatter'
 
 const reactElement = React.createElement('h1', null, 'Hello World');
+
+const fuckElement = {
+  type: 'div',
+  props: {
+    children: [
+      {
+        type: 'h1',
+        props: {
+          children: '自定义渲染'
+        }
+      },
+      {
+        type: 'fuck',
+        props: {
+          children: '这里添加了 fuck 组件，并渲染成绿色'
+        }
+      }
+    ]
+  }
+}
 
 const cusPlaceHolder = {
   type: 'div',
@@ -29,13 +49,15 @@ const cusPlaceHolder = {
   }
 }
 
-
+const CustomComponent = ({ children }) => (
+  <span style={{ color: 'green'}}>{children}</span>
+);
 
 function App() {
 
   const [cusInput, setCusInput] = React.useState<any>()
 
-  const parseCusInput = (input: string) => {
+  const parseCusInput = (input) => {
     try {
       return JSON.parse(input)
     } catch (e) {
@@ -59,12 +81,29 @@ function App() {
             <pre>{JSON.stringify(reactElement, null, 2)}</pre>
           </td>
           <td>
-            {xmlFormat(ReactDomServer.renderToStaticMarkup(reactElement))}
+            <pre>{xmlFormat(ReactDomServer.renderToStaticMarkup(reactElement))}</pre>
           </td>
           <td>
             <Markdown
               rehypePlugins={[rehypeRaw]}
               children={ReactDomServer.renderToStaticMarkup(reactElement)}
+            />
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <pre>{JSON.stringify(fuckElement, null, 2)}</pre>
+          </td>
+          <td>
+            <pre>{xmlFormat(ReactDomServer.renderToStaticMarkup(deserialize(fuckElement)))}</pre>
+          </td>
+          <td>
+            <Markdown
+              rehypePlugins={[rehypeRaw]}
+              children={ReactDomServer.renderToStaticMarkup(deserialize(fuckElement))}
+              components={{
+                fuck: CustomComponent
+              }}
             />
           </td>
         </tr>
@@ -91,5 +130,4 @@ function App() {
     </>
   )
 }
-
 export default App
